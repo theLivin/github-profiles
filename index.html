@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      crossorigin
+      src="https://unpkg.com/react@16/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"
+    ></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400&family=Poppins&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>GitHub Profiles - Retrieve GitHub Users Profile</title>
+
+    <style>
+      html,
+      body {
+        font-family: "Fira Code", monospace;
+        box-sizing: border-box;
+        background-color: rgba(247, 247, 247, 0.548);
+      }
+
+      h1 {
+        font-family: "Poppins", sans-serif;
+      }
+
+      form,
+      .profile {
+        padding: 0.5rem;
+        display: flex;
+        margin-bottom: 1rem;
+      }
+
+      input,
+      button {
+        border: none;
+        padding: 0.7rem;
+        font: inherit;
+      }
+
+      input {
+        width: 70%;
+        border-left: 5px solid grey;
+      }
+
+      button {
+        width: 30%;
+        background: lightblue;
+        color: #222;
+      }
+
+      button:focus {
+        background: rgb(28, 170, 218);
+        color: white;
+        outline: none;
+      }
+
+      input:focus {
+        outline: none;
+        border-left: 5px solid rgb(28, 170, 218);
+      }
+
+      img {
+        width: 75px;
+        height: 75px;
+      }
+
+      .app {
+        margin: 0.5em auto;
+        width: 70%;
+      }
+
+      .profile {
+        border-bottom: 1px solid grey;
+      }
+
+      .info {
+        margin-left: 1rem;
+      }
+
+      .name {
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+
+      .label {
+        color: rgb(28, 170, 218);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="mountNode"></div>
+
+    <script type="text/babel">
+      class Card extends React.Component {
+        render() {
+          const profile = this.props;
+          return (
+            <div className="profile">
+              <img src={profile.avatar_url} alt="" />
+              <div className="info">
+                <div className="name">{profile.login}</div>
+                <div className="company">
+                  <span className="label">Company: </span>
+                  {profile.company}
+                </div>
+                <div className="bio">
+                  <span className="label">Bio: </span>
+                  {profile.bio}
+                </div>
+              </div>
+            </div>
+          );
+        }
+      }
+
+      function CardList(props) {
+        return (
+          <div>
+            {props.profiles.map((profile) => (
+              <Card {...profile} key={profile.id} />
+            ))}
+          </div>
+        );
+      }
+
+      class Form extends React.Component {
+        state = {
+          username: "",
+        };
+
+        handleSubmit = async (event) => {
+          event.preventDefault();
+          const res = await fetch(
+            `https://api.github.com/users/${this.state.username}`
+          ).catch(() => {
+            return false;
+          });
+
+          if (!res.ok || !res) return;
+
+          const json = await res.json();
+
+          this.props.onSubmitFcn(json);
+        };
+
+        updateUsername = (event) =>
+          this.setState({ username: event.target.value });
+
+        render() {
+          return (
+            <form onSubmit={this.handleSubmit}>
+              <input
+                type="text"
+                placeholder="Enter GitHub Username"
+                value={this.state.username}
+                onChange={this.updateUsername}
+                required
+              />
+              <button type="submit">Search</button>
+            </form>
+          );
+        }
+      }
+
+      class App extends React.Component {
+        // constructor(props) {
+        //   super(props);
+        //   this.state = {
+        //     profiles: testData,
+        //   };
+        // }
+
+        // or
+
+        state = {
+          profiles: [],
+        };
+
+        addNewProfile = (profileData) => {
+          console.log("App", profileData);
+          this.setState((prevState) => ({
+            profiles: [profileData, ...prevState.profiles],
+          }));
+        };
+
+        render() {
+          return (
+            <div className="app">
+              <h1>{this.props.title}</h1>
+              <Form onSubmitFcn={this.addNewProfile} />
+              <CardList profiles={this.state.profiles} />
+            </div>
+          );
+        }
+      }
+
+      ReactDOM.render(
+        <App title="GitHub Profiles" />,
+        document.getElementById("mountNode")
+      );
+    </script>
+  </body>
+</html>
