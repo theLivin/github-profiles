@@ -25,7 +25,7 @@
       body {
         font-family: "Fira Code", monospace;
         box-sizing: border-box;
-        background-color: rgba(247, 247, 247, 0.548);
+        background-color: lightgray;
       }
 
       h1 {
@@ -48,24 +48,27 @@
 
       input {
         width: 70%;
-        border-left: 5px solid grey;
+        border-left: 5px solid lightgray;
       }
 
       button {
         width: 30%;
-        background: lightblue;
+        background: lightgray;
+        border: 1px solid coral;
         color: #222;
       }
 
       button:focus {
-        background: rgb(28, 170, 218);
+        background: coral;
         color: white;
         outline: none;
       }
 
-      input:focus {
+      input:focus,
+      input:hover,
+      input:active {
         outline: none;
-        border-left: 5px solid rgb(28, 170, 218);
+        border-left: 5px solid coral;
       }
 
       img {
@@ -79,7 +82,7 @@
       }
 
       .profile {
-        border-bottom: 1px solid grey;
+        border-bottom: 1px solid coral;
       }
 
       .info {
@@ -92,7 +95,7 @@
       }
 
       .label {
-        color: rgb(28, 170, 218);
+        color: coral;
       }
     </style>
   </head>
@@ -107,7 +110,13 @@
             <div className="profile">
               <img src={profile.avatar_url} alt="" />
               <div className="info">
-                <div className="name">{profile.login}</div>
+                {profile.name ? (
+                  <div className="name">
+                    {profile.name}({profile.login})
+                  </div>
+                ) : (
+                  <div className="name">{profile.login}</div>
+                )}
                 <div className="company">
                   <span className="label">Company: </span>
                   {profile.company}
